@@ -78,7 +78,7 @@ export default function Terminal({ onContinue }: { onContinue: () => void }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [terminalPrompt]);
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter") {

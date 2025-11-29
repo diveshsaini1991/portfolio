@@ -17,11 +17,11 @@ const LetterGlitch = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationRef = useRef<number | null>(null);
-  const letters = useRef<any[]>([]);
+  const letters = useRef<Array<{ char: string; color: string; targetColor: string; colorProgress: number }>>([]);
   const grid = useRef({ columns: 0, rows: 0 });
   const context = useRef<CanvasRenderingContext2D | null>(null);
   const lastGlitchTime = useRef(Date.now());
-  let isUnmounted = false;
+  const isUnmounted = useRef(false);
 
   const lettersAndSymbols = Array.from(characters);
   const fontSize = 16;
@@ -162,7 +162,7 @@ const LetterGlitch = ({
   };
 
   const animate = () => {
-    if (isUnmounted) return;
+    if (isUnmounted.current) return;
     const now = Date.now();
     if (now - lastGlitchTime.current >= glitchSpeed) {
       updateLetters();
@@ -176,8 +176,7 @@ const LetterGlitch = ({
   };
 
   useEffect(() => {
-    let localUnmounted = false;
-    isUnmounted = false;
+    isUnmounted.current = false;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -200,12 +199,10 @@ const LetterGlitch = ({
     window.addEventListener("resize", handleResize);
 
     return () => {
-      localUnmounted = true;
-      isUnmounted = true;
+      isUnmounted.current = true;
       cancelAnimationFrame(animationRef.current!);
       window.removeEventListener("resize", handleResize);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [glitchSpeed, smooth]);
 
   return (

@@ -26,7 +26,6 @@ const springValues: SpringOptions = {
 
 export default function TiltedCard({
   backgroundComponent,
-  altText = "Tilted card background",
   captionText = "",
   containerHeight = "300px",
   containerWidth = "300px",
