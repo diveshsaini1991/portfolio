@@ -1,12 +1,39 @@
 {
-  "name": "portfolio",
-  "version": "0.1.0",
+  "name": "divesh-saini-portfolio",
+  "version": "1.0.0",
+  "description": "Interactive portfolio showcasing backend development skills and full-stack expertise",
+  "author": {
+    "name": "Divesh Saini",
+    "email": "diveshsaini1991@gmail.com",
+    "url": "https://github.com/diveshsaini1991"
+  },
+  "license": "MIT",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/diveshsaini1991/portfolio.git"
+  },
+  "keywords": [
+    "portfolio",
+    "nextjs",
+    "typescript",
+    "backend-developer",
+    "full-stack",
+    "react",
+    "tailwindcss"
+  ],
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf .next out node_modules/.cache"
+  },
+  "engines": {
+    "node": ">=18.17.0",
+    "npm": ">=9.0.0"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
-const STEP_DELAYS = [1000, 1500, 1500];
+const STEP_DELAYS = [400, 600, 400];
 
 async function fetchUserIp() {
   try {
@@ -46,14 +46,14 @@ export default function Terminal({ onContinue }: { onContinue: () => void }) {
     let cancelled = false; // cleanup flag
 
     async function runSequence() {
-      let lines = [`${terminalPrompt}Requesting access...`];
+      const lines = [`${terminalPrompt}Requesting access...`];
       setTerminalText(lines.join("\n"));
-      await new Promise((r) => setTimeout(r, 1200));
+      await new Promise((r) => setTimeout(r, 600));
 
       const ip = await fetchUserIp();
       lines.push(`${terminalPrompt}Access granted to IP: ${ip}`);
       setTerminalText(lines.join("\n"));
-      await new Promise((r) => setTimeout(r, 1200));
+      await new Promise((r) => setTimeout(r, 600));
 
       lines.push(`${terminalPrompt}Loading user environment...`);
       setTerminalText(lines.join("\n"));
@@ -85,7 +85,9 @@ export default function Terminal({ onContinue }: { onContinue: () => void }) {
       e.preventDefault();
       const answer = userInput.trim().toLowerCase();
       if (answer === "y") {
-        setTerminalText((prev) => prev + "\n" + terminalPrompt + userInput);
+        // Add user input and a blank line (like real terminal)
+        setTerminalText((prev) => prev + "\n" + terminalPrompt + userInput + "\n");
+        setInputActive(false);
         onContinue();
       } else if (answer === "n") {
         setTerminalText(
@@ -141,7 +143,7 @@ export default function Terminal({ onContinue }: { onContinue: () => void }) {
       onKeyDown={handleInputKeyDown}
       spellCheck={false}
       rows={20}
-      className="w-full h-screen resize-none bg-black text-green-400 font-mono p-4 rounded-none border-0 focus:outline-none focus:ring-0"
+      className="w-full h-screen resize-none bg-black text-green-400 font-mono p-2 sm:p-4 text-xs sm:text-sm md:text-base rounded-none border-0 focus:outline-none focus:ring-0"
     />
   );
 }

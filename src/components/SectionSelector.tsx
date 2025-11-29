@@ -13,7 +13,7 @@ export default function SectionSelector() {
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, delay: 0.2 }}
-      className="flex flex-col md:flex-row items-center justify-center gap-20 w-full max-w-md"
+      className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-12 md:gap-20 w-full max-w-5xl px-4"
     >
       {/* 👨‍💻 Developer Card */}
       <TiltedCard
@@ -36,7 +36,7 @@ export default function SectionSelector() {
         showTooltip={true}
         displayOverlayContent={true}
         overlayContent={
-          <p className="tilted-card-demo-text text-white text-xl font-bold">
+          <p className="tilted-card-demo-text text-white text-lg sm:text-xl font-bold">
             Developer
           </p>
         }
@@ -63,7 +63,7 @@ export default function SectionSelector() {
         showTooltip={true}
         displayOverlayContent={true}
         overlayContent={
-          <p className="tilted-card-demo-text text-white text-xl font-bold">
+          <p className="tilted-card-demo-text text-white text-lg sm:text-xl font-bold">
             Non‑Tech / HR
           </p>
         }

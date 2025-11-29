@@ -23,9 +23,9 @@ export default function ThemeToggle() {
     <button
       aria-label="Toggle Theme"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="rounded-xl p-2 bg-neutral-800 text-gray-200 hover:bg-neutral-700 transition-colors"
+      className="rounded-xl p-1.5 sm:p-2 bg-neutral-800 text-gray-200 hover:bg-neutral-700 transition-colors"
     >
-      {theme === "dark" ? <SunIcon size={18} /> : <MoonIcon size={18} />}
+      {theme === "dark" ? <SunIcon size={16} className="sm:w-[18px] sm:h-[18px]" /> : <MoonIcon size={16} className="sm:w-[18px] sm:h-[18px]" />}
     </button>
   );
 }
