@@ -1,8 +1,16 @@
 import "./globals.css";
+import type { Metadata, Viewport } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Divesh Saini | Portfolio",
   description: "Full Stack Developer Portfolio",
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 };
 
 export default function RootLayout({

@@ -26,7 +26,6 @@ const springValues: SpringOptions = {
 
 export default function TiltedCard({
   backgroundComponent,
-  altText = "Tilted card background",
   captionText = "",
   containerHeight = "300px",
   containerWidth = "300px",
@@ -92,8 +91,12 @@ export default function TiltedCard({
       ref={ref}
       className={`relative flex flex-col items-center justify-center [perspective:800px] ${className}`}
       style={{
-        height: containerHeight,
-        width: containerWidth,
+        height: typeof containerHeight === 'string' && containerHeight.includes('px') 
+          ? `min(${containerHeight}, 80vw)` 
+          : containerHeight,
+        width: typeof containerWidth === 'string' && containerWidth.includes('px')
+          ? `min(${containerWidth}, 80vw)`
+          : containerWidth,
         flexShrink: 0,
       }}
       onMouseMove={handleMouse}
@@ -102,7 +105,7 @@ export default function TiltedCard({
       onClick={onClick}
     >
       {showMobileWarning && (
-        <div className="absolute top-4 text-center text-sm block sm:hidden">
+        <div className="absolute top-4 text-center text-xs sm:text-sm block sm:hidden px-2">
           This effect is not optimized for mobile. Check on desktop.
         </div>
       )}
