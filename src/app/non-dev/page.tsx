@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { destroySession } from '@/lib/session-manager';
 import { experiences } from '@/data/experience';
 import { projects } from '@/data/projects';
 import { skills, getSkillsByCategory } from '@/data/skills';
@@ -10,7 +12,17 @@ import { Experience, Project, Skill } from '@/types';
 type TabType = 'about' | 'experience' | 'projects' | 'skills';
 
 export default function NonDevPortfolio() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>('about');
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = () => {
+    setIsLoggingOut(true);
+    setTimeout(() => {
+      destroySession();
+      router.push('/');
+    }, 1500); // Show logout animation for 1.5 seconds
+  };
 
   const tabs = [
     { id: 'about' as TabType, label: 'About', icon: '👋' },
@@ -21,8 +33,50 @@ export default function NonDevPortfolio() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      {/* Logout Modal */}
+      <AnimatePresence>
+        {isLoggingOut && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center"
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-white dark:bg-gray-800 border-2 border-red-500 rounded-lg p-8 max-w-md w-full mx-4"
+            >
+              <div className="text-center">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  className="w-16 h-16 border-4 border-red-500 border-t-transparent rounded-full mx-auto mb-4"
+                />
+                <h3 className="text-xl font-bold text-red-600 dark:text-red-400 mb-2">Logging Out</h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">Clearing session and redirecting...</p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 relative">
+        {/* Logout Button - Top Right */}
+        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 rounded-lg transition-all text-sm font-medium shadow-sm hover:shadow-md"
+            title="Logout and return to home"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            <span className="hidden sm:inline">Logout</span>
+          </button>
+        </div>
+
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           <div className="text-center">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-2">
