@@ -144,7 +144,7 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 1 }}
-          className="absolute bottom-6 text-center text-xs sm:text-sm text-gray-400 dark:text-gray-600"
+          className="bottom-6 text-center text-xs sm:text-sm text-gray-400 dark:text-gray-600 py-10"
         >
           Software Development Engineer • Backend Specialist
         </motion.div>
