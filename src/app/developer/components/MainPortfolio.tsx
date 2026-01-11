@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { SectionType } from '@/types';
 import PortfolioHeader from './PortfolioHeader';
-import SectionNavigation from './SectionNavigation';
+import SectionNavigation from './sections/SectionNavigation';
 import SQLSkillsEditor from './sections/SQLSkillsEditor';
 import PostmanProjects from './sections/PostmanProjects';
 import JWTDemo from './sections/JWTDemo';
@@ -32,7 +32,7 @@ export default function MainPortfolio() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col relative">
       <PortfolioHeader />
       <SectionNavigation activeSection={activeSection} onSectionChange={setActiveSection} />
       
@@ -52,7 +52,7 @@ export default function MainPortfolio() {
       </div>
 
       {/* Footer */}
-      <div className="bg-gray-800/30 border-t border-gray-700 px-3 sm:px-4 md:px-6 py-2 sm:py-3 text-center text-[10px] sm:text-xs text-gray-500">
+      <div className="bg-gray-200/30 dark:bg-gray-800/30 border-t border-gray-300 dark:border-gray-700 px-3 sm:px-4 md:px-6 py-2 sm:py-3 text-center text-[10px] sm:text-xs text-gray-600 dark:text-gray-500">
         <span className="hidden sm:inline">Made with ❤️ by Divesh Saini • Built using Next.js, TypeScript & Tailwind CSS</span>
         <span className="sm:hidden">Made with ❤️ by Divesh Saini</span>
       </div>
@@ -62,14 +62,14 @@ export default function MainPortfolio() {
 
 function ComingSoonPlaceholder({ title, icon }: { title: string; icon: string }) {
   return (
-    <div className="w-full h-full flex items-center justify-center bg-gray-900 rounded-lg border border-gray-700 p-4">
+    <div className="w-full h-full flex items-center justify-center bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4 shadow-sm dark:shadow-none">
       <div className="text-center">
         <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4">{icon}</div>
-        <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-300 mb-2">{title}</h2>
+        <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">{title}</h2>
         <p className="text-sm sm:text-base text-gray-500">Coming Soon...</p>
-        <div className="mt-4 sm:mt-6 inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-800 rounded-lg">
-          <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
-          <span className="text-xs sm:text-sm text-gray-400">Under Development</span>
+        <div className="mt-4 sm:mt-6 inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+          <div className="w-2 h-2 bg-amber-500 dark:bg-yellow-500 rounded-full animate-pulse"></div>
+          <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Under Development</span>
         </div>
       </div>
     </div>

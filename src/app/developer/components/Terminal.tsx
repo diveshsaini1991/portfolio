@@ -121,29 +121,31 @@ export default function Terminal({ onContinue }: { onContinue: () => void }) {
   };
 
   return (
-    <textarea
-      ref={inputRef}
-      value={
-        inputActive
-          ? terminalText + "\n" + terminalPrompt + userInput
-          : terminalText
-      }
-      onChange={(e) => {
-        if (inputActive) {
-          const val = e.target.value;
-          const lastLine = val.split("\n").pop() || "";
-          if (lastLine.startsWith(terminalPrompt)) {
-            setUserInput(lastLine.slice(terminalPrompt.length));
-            setTerminalText(
-              val.substring(0, val.length - (lastLine.length + 1))
-            );
-          }
+    <div className="relative w-full h-screen bg-black">
+      <textarea
+        ref={inputRef}
+        value={
+          inputActive
+            ? terminalText + "\n" + terminalPrompt + userInput
+            : terminalText
         }
-      }}
-      onKeyDown={handleInputKeyDown}
-      spellCheck={false}
-      rows={20}
-      className="w-full h-screen resize-none bg-black text-green-400 font-mono p-2 sm:p-4 text-xs sm:text-sm md:text-base rounded-none border-0 focus:outline-none focus:ring-0"
-    />
+        onChange={(e) => {
+          if (inputActive) {
+            const val = e.target.value;
+            const lastLine = val.split("\n").pop() || "";
+            if (lastLine.startsWith(terminalPrompt)) {
+              setUserInput(lastLine.slice(terminalPrompt.length));
+              setTerminalText(
+                val.substring(0, val.length - (lastLine.length + 1))
+              );
+            }
+          }
+        }}
+        onKeyDown={handleInputKeyDown}
+        spellCheck={false}
+        rows={20}
+        className="w-full h-screen resize-none bg-black text-green-400 font-mono p-2 sm:p-4 text-xs sm:text-sm md:text-base rounded-none border-0 focus:outline-none focus:ring-0"
+      />
+    </div>
   );
 }
