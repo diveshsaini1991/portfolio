@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { destroySession } from '@/lib/session-manager';
+import ThemeToggle from '@/components/ThemeToggle';
 import { experiences } from '@/data/experience';
 import { projects } from '@/data/projects';
 import { skills, getSkillsByCategory } from '@/data/skills';
@@ -63,8 +64,11 @@ export default function NonDevPortfolio() {
 
       {/* Header */}
       <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 relative">
-        {/* Logout Button - Top Right */}
-        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
+        {/* Top Right Buttons */}
+        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10 flex items-center gap-2 sm:gap-3">
+          {/* Theme Toggle */}
+          <ThemeToggle />
+          {/* Logout Button */}
           <button
             onClick={handleLogout}
             className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 rounded-lg transition-all text-sm font-medium shadow-sm hover:shadow-md"
