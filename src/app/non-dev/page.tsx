@@ -195,9 +195,9 @@ function AboutSection() {
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Quick Stats</h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <StatCard number="4+" label="Years Coding" />
-            <StatCard number="4+" label="Projects" />
+            <StatCard number="7+" label="Major Projects" />
             <StatCard number="40+" label="Technologies" />
-            <StatCard number="1" label="Internship" />
+            <StatCard number="1" label="Experience" />
           </div>
         </div>
       </div>
