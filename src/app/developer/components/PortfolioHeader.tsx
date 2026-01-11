@@ -5,6 +5,7 @@ import { fetchUserIP, getSessionDuration } from '@/lib/session-utils';
 import { destroySession, getSessionPayload } from '@/lib/session-manager';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function PortfolioHeader() {
   const router = useRouter();
@@ -76,37 +77,40 @@ export default function PortfolioHeader() {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gray-800/50 backdrop-blur-sm border-b border-gray-700 px-3 sm:px-4 md:px-6 py-2 sm:py-3"
+        className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 px-3 sm:px-4 md:px-6 py-2 sm:py-3"
       >
       <div className="flex items-center justify-between flex-wrap gap-2 sm:gap-3 md:gap-4">
         {/* Left: Title */}
         <div className="flex-shrink-0">
-          <h1 className="text-base sm:text-lg md:text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-            Divesh Saini's Portfolio
+          <h1 className="text-base sm:text-lg md:text-xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 bg-clip-text text-transparent">
+            Divesh Saini&apos;s Portfolio
           </h1>
-          <p className="text-[10px] sm:text-xs text-gray-400 mt-0.5 hidden sm:block">Software Development Engineer • Backend Specialist</p>
+          <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 mt-0.5 hidden sm:block">Software Development Engineer • Backend Specialist</p>
         </div>
 
         {/* Right: Stats */}
         <div className="flex items-center gap-1.5 sm:gap-2 md:gap-4 text-xs sm:text-sm flex-wrap">
           {/* IP Address */}
-          <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-700/50 rounded-lg border border-gray-600">
-            <span className="text-gray-400 text-sm sm:text-base">🌐</span>
+          <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-200/50 dark:bg-gray-700/50 rounded-lg border border-gray-300 dark:border-gray-600">
+            <span className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">🌐</span>
             <span className="text-gray-500 text-[10px] sm:text-xs hidden sm:inline">IP:</span>
-            <span className="text-gray-300 font-mono text-[10px] sm:text-xs">{userIP}</span>
+            <span className="text-gray-700 dark:text-gray-300 font-mono text-[10px] sm:text-xs">{userIP}</span>
           </div>
 
           {/* Session Time */}
-          <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-700/50 rounded-lg border border-gray-600">
-            <span className="text-gray-400 text-sm sm:text-base">🕒</span>
+          <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-200/50 dark:bg-gray-700/50 rounded-lg border border-gray-300 dark:border-gray-600">
+            <span className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">🕒</span>
             <span className="text-gray-500 text-[10px] sm:text-xs hidden md:inline">Session:</span>
-            <span className="text-gray-300 font-mono tabular-nums text-[10px] sm:text-xs">{sessionTime}</span>
+            <span className="text-gray-700 dark:text-gray-300 font-mono tabular-nums text-[10px] sm:text-xs">{sessionTime}</span>
           </div>
+
+          {/* Theme Toggle */}
+          <ThemeToggle />
 
           {/* Logout Button */}
           <button
             onClick={handleLogout}
-            className="px-2 sm:px-3 py-1 sm:py-1.5 bg-red-600/20 hover:bg-red-600/30 border border-red-600/50 text-red-400 rounded-lg transition-colors text-[10px] sm:text-xs font-medium"
+            className="px-2 sm:px-3 py-1 sm:py-1.5 bg-red-100 dark:bg-red-600/20 hover:bg-red-200 dark:hover:bg-red-600/30 border border-red-300 dark:border-red-600/50 text-red-600 dark:text-red-400 rounded-lg transition-colors text-[10px] sm:text-xs font-medium"
             title="Clear session and return to terminal"
           >
             <span className="hidden sm:inline">🚪 Logout</span>
