@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import SectionSelector from "@/components/SectionSelector";
 import ThemeToggle from "@/components/ThemeToggle";
+import { startSessionTracking, VisitorStats } from "@/lib/visitor-tracker";
 
 export default function Home() {
   const [particles, setParticles] = useState<Array<{ left: number; top: number; duration: number; delay: number }>>([]);
+  const [visitorStats, setVisitorStats] = useState<VisitorStats>({ liveViewers: 0, totalVisits: 0, uniqueVisitors: 0 });
 
   useEffect(() => {
     // Generate particle positions only on client side to avoid hydration mismatch
@@ -17,6 +19,18 @@ export default function Home() {
       delay: Math.random() * 2,
     }));
     setParticles(generatedParticles);
+
+    // Start visitor tracking
+    let cleanupTracking: (() => void) | null = null;
+    startSessionTracking((stats) => {
+      setVisitorStats(stats);
+    }).then((cleanup) => {
+      cleanupTracking = cleanup;
+    });
+
+    return () => {
+      if (cleanupTracking) cleanupTracking();
+    };
   }, []);
 
   return (
@@ -87,8 +101,21 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Theme Toggle positioned absolutely at the top right */}
-      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
+      {/* Top Bar - Live Viewers & Theme Toggle */}
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10 flex items-center gap-3">
+        {/* Live Viewers Badge */}
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.5 }}
+          className="flex items-center gap-2 px-3 py-1.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full border border-gray-200 dark:border-gray-700 shadow-sm"
+        >
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+          </span>
+          <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{visitorStats.liveViewers} live</span>
+        </motion.div>
         <ThemeToggle />
       </div>
 

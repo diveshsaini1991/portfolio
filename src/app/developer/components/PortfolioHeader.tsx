@@ -6,12 +6,14 @@ import { destroySession, getSessionPayload } from '@/lib/session-manager';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '@/components/ThemeToggle';
+import { startSessionTracking, VisitorStats } from '@/lib/visitor-tracker';
 
 export default function PortfolioHeader() {
   const router = useRouter();
   const [userIP, setUserIP] = useState<string>('Loading...');
   const [sessionTime, setSessionTime] = useState<string>('00:00:00');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [liveViewers, setLiveViewers] = useState<number>(0);
 
   const handleLogout = () => {
     setIsDeleting(true);
@@ -33,8 +35,17 @@ export default function PortfolioHeader() {
       }
     }, 1000);
 
+    // Start visitor tracking
+    let cleanupTracking: (() => void) | null = null;
+    startSessionTracking((stats: VisitorStats) => {
+      setLiveViewers(stats.liveViewers);
+    }).then((cleanup) => {
+      cleanupTracking = cleanup;
+    });
+
     return () => {
       clearInterval(timer);
+      if (cleanupTracking) cleanupTracking();
     };
   }, []);
 
@@ -90,6 +101,16 @@ export default function PortfolioHeader() {
 
         {/* Right: Stats */}
         <div className="flex items-center gap-1.5 sm:gap-2 md:gap-4 text-xs sm:text-sm flex-wrap">
+          {/* Live Viewers */}
+          <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-green-100/50 dark:bg-green-900/30 rounded-lg border border-green-300 dark:border-green-700">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+            <span className="text-green-700 dark:text-green-400 font-mono text-[10px] sm:text-xs font-medium">{liveViewers}</span>
+            <span className="text-green-600 dark:text-green-500 text-[10px] sm:text-xs hidden sm:inline">live</span>
+          </div>
+
           {/* IP Address */}
           <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-200/50 dark:bg-gray-700/50 rounded-lg border border-gray-300 dark:border-gray-600">
             <span className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">🌐</span>
