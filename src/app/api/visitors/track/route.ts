@@ -12,76 +12,63 @@ export const dynamic = 'force-dynamic';
 // POST - Track a new visit or update session
 export async function POST(request: NextRequest) {
   // Check if MongoDB URI is configured
-  const mongoUri = process.env.MONGODB_URI;
-  console.log('[Visitor Track] MONGODB_URI configured:', !!mongoUri);
-  
-  if (!mongoUri) {
-    console.log('[Visitor Track] No MONGODB_URI - returning placeholder');
+  if (!process.env.MONGODB_URI) {
     return NextResponse.json({
       success: true,
       isNewSession: true,
-      stats: {
-        liveViewers: 1,
-        totalVisits: 0,
-        uniqueVisitors: 0,
-      },
+      stats: { liveViewers: 1, totalVisits: 0, uniqueVisitors: 0 },
       note: 'MongoDB not configured'
     });
   }
 
   try {
-    console.log('[Visitor Track] Connecting to MongoDB...');
+    // Check if this is a deactivation request (from sendBeacon - check URL params first)
+    const { searchParams } = new URL(request.url);
+    const sessionIdFromParams = searchParams.get('sessionId');
+    
+    // For sendBeacon deactivation requests, handle via URL params only (body may be unreadable)
+    if (sessionIdFromParams) {
+      await dbConnect();
+      await VisitorSession.updateOne(
+        { sessionId: sessionIdFromParams },
+        { $set: { isActive: false } }
+      );
+      return NextResponse.json({ success: true });
+    }
+    
     await dbConnect();
-    console.log('[Visitor Track] Connected successfully');
     
     let body;
     try {
       body = await request.json();
-      console.log('[Visitor Track] Request body:', JSON.stringify(body));
-    } catch (parseError) {
-      console.error('[Visitor Track] Failed to parse request body:', parseError);
-      body = {};
+    } catch {
+      // Body parsing failed (likely ECONNRESET from sendBeacon) - return success silently
+      return NextResponse.json({ success: true });
     }
     
     const { sessionId, page, action } = body;
     
-    // Handle deactivation request from sendBeacon (page unload)
+    // Handle deactivation request from sendBeacon body
     if (action === 'deactivate') {
-      const { searchParams } = new URL(request.url);
-      const sessionIdFromParams = searchParams.get('sessionId');
-      if (sessionIdFromParams) {
-        console.log('[Visitor Track] Deactivating session:', sessionIdFromParams);
-        await VisitorSession.updateOne(
-          { sessionId: sessionIdFromParams },
-          { $set: { isActive: false } }
-        );
-      }
       return NextResponse.json({ success: true });
     }
     
-    // Validate sessionId
+    // Validate sessionId - require it
     if (!sessionId) {
-      console.error('[Visitor Track] Missing sessionId in request');
-      // Generate a fallback session ID based on IP
-      const forwardedFor = request.headers.get('x-forwarded-for');
-      const ip = forwardedFor ? forwardedFor.split(',')[0].trim() : 'unknown';
-      const fallbackSessionId = `fallback_${ip}_${Date.now()}`;
-      console.log('[Visitor Track] Using fallback sessionId:', fallbackSessionId);
-      body.sessionId = fallbackSessionId;
+      return NextResponse.json({
+        success: false,
+        error: 'Missing sessionId',
+        stats: { liveViewers: 1, totalVisits: 0, uniqueVisitors: 0 }
+      });
     }
-    
-    const finalSessionId = body.sessionId || sessionId;
     
     // Get client IP
     const forwardedFor = request.headers.get('x-forwarded-for');
     const ip = forwardedFor ? forwardedFor.split(',')[0].trim() : 'unknown';
     const userAgent = request.headers.get('user-agent') || '';
 
-    console.log('[Visitor Track] Session ID:', finalSessionId, 'Page:', page);
-
     // Check if session exists
-    const existingSession = await VisitorSession.findOne({ sessionId: finalSessionId });
-    console.log('[Visitor Track] Existing session:', existingSession ? 'found' : 'not found');
+    const existingSession = await VisitorSession.findOne({ sessionId });
     
     if (existingSession) {
       // Update existing session
@@ -99,7 +86,6 @@ export async function POST(request: NextRequest) {
         success: true,
         isNewSession: false,
         stats: {
-          // Always show at least 1 (the current user)
           liveViewers: Math.max(1, liveViewers),
           totalVisits: stats.totalVisits,
           uniqueVisitors: stats.uniqueVisitors,
@@ -111,21 +97,27 @@ export async function POST(request: NextRequest) {
     const existingVisitorByIP = await VisitorSession.findOne({ ip });
     const isNewVisitor = !existingVisitorByIP;
 
-    // Create new session
-    console.log('[Visitor Track] Creating new session for IP:', ip);
-    const newSession = await VisitorSession.create({
-      sessionId: finalSessionId,
-      ip,
-      userAgent,
-      page: page || '/',
-      isActive: true,
-      lastActivity: new Date(),
-    });
-    console.log('[Visitor Track] New session created:', newSession._id);
+    // Create or update session (upsert to avoid duplicate key errors)
+    await VisitorSession.findOneAndUpdate(
+      { sessionId },
+      {
+        $set: {
+          ip,
+          userAgent,
+          page: page || '/',
+          isActive: true,
+          lastActivity: new Date(),
+        },
+        $setOnInsert: {
+          sessionId,
+          createdAt: new Date(),
+        }
+      },
+      { upsert: true, new: true }
+    );
 
     // Update global stats
     const stats = await getOrCreateStats();
-    console.log('[Visitor Track] Current stats before update:', { totalVisits: stats.totalVisits, uniqueVisitors: stats.uniqueVisitors });
     stats.totalVisits += 1;
     if (isNewVisitor) {
       stats.uniqueVisitors += 1;
@@ -142,23 +134,17 @@ export async function POST(request: NextRequest) {
       isNewSession: true,
       isNewVisitor,
       stats: {
-        // Always show at least 1 (the current user)
         liveViewers: Math.max(1, liveViewers),
         totalVisits: stats.totalVisits,
         uniqueVisitors: stats.uniqueVisitors,
       }
     });
   } catch (error) {
-    console.error('[Visitor Track] ERROR:', error);
-    console.error('[Visitor Track] Error details:', error instanceof Error ? error.message : String(error));
+    console.error('[Visitor Track] Error:', error instanceof Error ? error.message : error);
     return NextResponse.json({
       success: false,
-      stats: {
-        liveViewers: 1,
-        totalVisits: 0,
-        uniqueVisitors: 0,
-      },
-      error: error instanceof Error ? error.message : 'Database connection failed'
+      stats: { liveViewers: 1, totalVisits: 0, uniqueVisitors: 0 },
+      error: 'Database error'
     });
   }
 }
