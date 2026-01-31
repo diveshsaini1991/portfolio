@@ -97,18 +97,14 @@ export async function startSessionTracking(
   // Track visibility changes
   function handleVisibilityChange() {
     if (document.hidden) {
-      // Page is hidden, mark as potentially inactive after delay
-      setTimeout(async () => {
-        if (document.hidden && isActive) {
-          try {
-            await fetch(`/api/visitors/track?sessionId=${encodeURIComponent(sessionId)}`, {
-              method: 'DELETE',
-            });
-          } catch (error) {
-            console.error('Error marking session inactive:', error);
-          }
-        }
-      }, 30000); // 30 second delay before marking inactive
+      // Page is hidden, mark as inactive immediately
+      try {
+        // Use sendBeacon for reliability when tab is hidden
+        const url = `/api/visitors/track?sessionId=${encodeURIComponent(sessionId)}`;
+        navigator.sendBeacon(url, JSON.stringify({ action: 'deactivate' }));
+      } catch (error) {
+        console.error('Error marking session inactive:', error);
+      }
     } else {
       // Page is visible again, re-track
       trackVisit();
@@ -118,11 +114,11 @@ export async function startSessionTracking(
   // Initial track
   await trackVisit();
 
-  // Poll for stats every 10 seconds
-  intervalId = setInterval(fetchStats, 10000);
+  // Poll for stats every 5 seconds
+  intervalId = setInterval(fetchStats, 5000);
 
-  // Keep session alive every 30 seconds
-  heartbeatId = setInterval(() => trackVisit(), 30000);
+  // Keep session alive every 20 seconds (must be less than 1 minute stale timeout)
+  heartbeatId = setInterval(() => trackVisit(), 20000);
 
   // Listen for page unload
   window.addEventListener('beforeunload', handleUnload);
