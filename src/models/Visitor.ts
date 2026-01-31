@@ -60,11 +60,12 @@ export async function getOrCreateStats(): Promise<IVisitorStats> {
   return stats;
 }
 
-// Helper to clean up stale sessions (inactive for more than 5 minutes)
+// Helper to clean up stale sessions (inactive for more than 1 minute)
 export async function cleanupStaleSessions(): Promise<number> {
-  const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+  // Sessions are considered stale if no heartbeat for 1 minute
+  const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
   const result = await VisitorSession.updateMany(
-    { lastActivity: { $lt: fiveMinutesAgo }, isActive: true },
+    { lastActivity: { $lt: oneMinuteAgo }, isActive: true },
     { $set: { isActive: false } }
   );
   return result.modifiedCount;
