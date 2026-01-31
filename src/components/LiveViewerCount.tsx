@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { startSessionTracking, VisitorStats } from '@/lib/visitor-tracker';
 
@@ -25,8 +25,15 @@ export default function LiveViewerCount({
   });
   const [isLoading, setIsLoading] = useState(false); // Don't show loading since we start with 1
   const [isConnected, setIsConnected] = useState(false);
+  
+  // Prevent double initialization in React Strict Mode
+  const initRef = useRef(false);
 
   useEffect(() => {
+    // Skip if already initialized (React Strict Mode runs effects twice)
+    if (initRef.current) return;
+    initRef.current = true;
+    
     let cleanup: (() => void) | null = null;
     let isMounted = true;
 

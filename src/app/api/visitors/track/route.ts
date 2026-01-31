@@ -43,7 +43,21 @@ export async function POST(request: NextRequest) {
       body = {};
     }
     
-    const { sessionId, page } = body;
+    const { sessionId, page, action } = body;
+    
+    // Handle deactivation request from sendBeacon (page unload)
+    if (action === 'deactivate') {
+      const { searchParams } = new URL(request.url);
+      const sessionIdFromParams = searchParams.get('sessionId');
+      if (sessionIdFromParams) {
+        console.log('[Visitor Track] Deactivating session:', sessionIdFromParams);
+        await VisitorSession.updateOne(
+          { sessionId: sessionIdFromParams },
+          { $set: { isActive: false } }
+        );
+      }
+      return NextResponse.json({ success: true });
+    }
     
     // Validate sessionId
     if (!sessionId) {
