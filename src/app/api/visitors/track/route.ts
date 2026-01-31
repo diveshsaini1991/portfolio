@@ -34,18 +34,39 @@ export async function POST(request: NextRequest) {
     await dbConnect();
     console.log('[Visitor Track] Connected successfully');
     
-    const body = await request.json();
+    let body;
+    try {
+      body = await request.json();
+      console.log('[Visitor Track] Request body:', JSON.stringify(body));
+    } catch (parseError) {
+      console.error('[Visitor Track] Failed to parse request body:', parseError);
+      body = {};
+    }
+    
     const { sessionId, page } = body;
+    
+    // Validate sessionId
+    if (!sessionId) {
+      console.error('[Visitor Track] Missing sessionId in request');
+      // Generate a fallback session ID based on IP
+      const forwardedFor = request.headers.get('x-forwarded-for');
+      const ip = forwardedFor ? forwardedFor.split(',')[0].trim() : 'unknown';
+      const fallbackSessionId = `fallback_${ip}_${Date.now()}`;
+      console.log('[Visitor Track] Using fallback sessionId:', fallbackSessionId);
+      body.sessionId = fallbackSessionId;
+    }
+    
+    const finalSessionId = body.sessionId || sessionId;
     
     // Get client IP
     const forwardedFor = request.headers.get('x-forwarded-for');
     const ip = forwardedFor ? forwardedFor.split(',')[0].trim() : 'unknown';
     const userAgent = request.headers.get('user-agent') || '';
 
-    console.log('[Visitor Track] Session ID:', sessionId, 'Page:', page);
+    console.log('[Visitor Track] Session ID:', finalSessionId, 'Page:', page);
 
     // Check if session exists
-    const existingSession = await VisitorSession.findOne({ sessionId });
+    const existingSession = await VisitorSession.findOne({ sessionId: finalSessionId });
     console.log('[Visitor Track] Existing session:', existingSession ? 'found' : 'not found');
     
     if (existingSession) {
@@ -79,7 +100,7 @@ export async function POST(request: NextRequest) {
     // Create new session
     console.log('[Visitor Track] Creating new session for IP:', ip);
     const newSession = await VisitorSession.create({
-      sessionId,
+      sessionId: finalSessionId,
       ip,
       userAgent,
       page: page || '/',
